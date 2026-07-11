@@ -1,13 +1,21 @@
 class UserProfile {
   String name;
   int? age;
+
+  double? currentPortfolio;
+
   double? monthlyInvestment;
-  int? retirementAge;
+
+  int? targetFinancialIndependenceAge;
+
+  double? desiredMonthlyIncomeToday;
 
   UserProfile({
     this.name = '',
     this.age,
+    this.currentPortfolio,
     this.monthlyInvestment,
-    this.retirementAge,
+    this.targetFinancialIndependenceAge,
+    this.desiredMonthlyIncomeToday,
   });
 }

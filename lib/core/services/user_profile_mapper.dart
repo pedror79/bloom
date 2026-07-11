@@ -8,25 +8,28 @@ class UserProfileMapper {
 
   BloomUser? toBloomUser(UserProfile profile) {
     final name = profile.name.trim();
-    final age = profile.age;
-    final monthlyInvestment = profile.monthlyInvestment;
-    final retirementAge = profile.retirementAge;
 
     if (name.isEmpty ||
-        age == null ||
-        monthlyInvestment == null ||
-        retirementAge == null) {
+        profile.age == null ||
+        profile.currentPortfolio == null ||
+        profile.monthlyInvestment == null ||
+        profile.targetFinancialIndependenceAge == null ||
+        profile.desiredMonthlyIncomeToday == null) {
       return null;
     }
 
     return BloomUser(
       identity: Identity(
         name: name,
-        age: age,
+        age: profile.age!,
       ),
       financialProfile: FinancialProfile(
-        monthlyInvestment: monthlyInvestment,
-        retirementAge: retirementAge,
+        currentPortfolio: profile.currentPortfolio!,
+        monthlyInvestment: profile.monthlyInvestment!,
+        desiredMonthlyIncomeToday:
+            profile.desiredMonthlyIncomeToday!,
+        targetFinancialIndependenceAge:
+            profile.targetFinancialIndependenceAge!,
       ),
     );
   }

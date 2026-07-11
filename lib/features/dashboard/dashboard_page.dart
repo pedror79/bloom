@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../models/user_profile.dart';
 import '../../shared/widgets/bloom_card.dart';
@@ -18,8 +19,13 @@ class DashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentYear = DateTime.now().year;
     final currentAge = profile.age ?? 0;
-    final retirementAge = profile.retirementAge ?? currentAge;
-    final yearsRemaining = retirementAge - currentAge;
+
+    final targetFinancialIndependenceAge =
+        profile.targetFinancialIndependenceAge ?? currentAge;
+
+    final yearsRemaining =
+        targetFinancialIndependenceAge - currentAge;
+
     final targetYear = currentYear + yearsRemaining;
     final monthlyInvestment = profile.monthlyInvestment ?? 0;
 
@@ -56,16 +62,12 @@ class DashboardPage extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 34),
-
               PageHeader(
                 subtitle: 'Olá, ${profile.name} 👋',
                 title: 'O Meu Plano',
               ),
-
               const SizedBox(height: 24),
-
               ProgressCard(
                 progress: progress,
                 title: 'Progresso do plano',
@@ -73,9 +75,7 @@ class DashboardPage extends StatelessWidget {
                     ? 'Tens cerca de $yearsRemaining anos para construir o teu objetivo.'
                     : 'O teu objetivo precisa de ser revisto.',
               ),
-
               const SizedBox(height: 18),
-
               Row(
                 children: [
                   Expanded(
@@ -97,7 +97,7 @@ class DashboardPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            '$retirementAge anos',
+                            '$targetFinancialIndependenceAge anos',
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
@@ -141,9 +141,7 @@ class DashboardPage extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 18),
-
               BloomCard(
                 child: Row(
                   children: [
@@ -186,9 +184,7 @@ class DashboardPage extends StatelessWidget {
                   ],
                 ),
               ),
-
               const SizedBox(height: 18),
-
               BloomCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,9 +220,7 @@ class DashboardPage extends StatelessWidget {
                   ],
                 ),
               ),
-
               const SizedBox(height: 24),
-
               PrimaryButton(
                 text: 'Simular cenários',
                 icon: Icons.arrow_forward_rounded,
@@ -240,7 +234,6 @@ class DashboardPage extends StatelessWidget {
                   );
                 },
               ),
-
               const SizedBox(height: 16),
             ],
           ),

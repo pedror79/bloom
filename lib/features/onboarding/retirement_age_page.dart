@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../models/user_profile.dart';
 import '../dashboard/dashboard_page.dart';
@@ -16,32 +17,32 @@ class RetirementAgePage extends StatefulWidget {
 }
 
 class _RetirementAgePageState extends State<RetirementAgePage> {
-  final TextEditingController _retirementAgeController =
+  final TextEditingController _targetAgeController =
       TextEditingController();
 
   @override
   void dispose() {
-    _retirementAgeController.dispose();
+    _targetAgeController.dispose();
     super.dispose();
   }
 
-  int? _readRetirementAge() {
-    return int.tryParse(_retirementAgeController.text.trim());
+  int? _readTargetAge() {
+    return int.tryParse(_targetAgeController.text.trim());
   }
 
   void _openDashboard() {
-    final retirementAge = _readRetirementAge();
+    final targetAge = _readTargetAge();
     final currentAge = widget.profile.age;
 
-    if (retirementAge == null || currentAge == null) {
+    if (targetAge == null || currentAge == null) {
       return;
     }
 
-    if (retirementAge <= currentAge || retirementAge > 100) {
+    if (targetAge <= currentAge || targetAge > 100) {
       return;
     }
 
-    widget.profile.retirementAge = retirementAge;
+    widget.profile.targetFinancialIndependenceAge = targetAge;
 
     Navigator.pushAndRemoveUntil(
       context,
@@ -56,13 +57,13 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
 
   @override
   Widget build(BuildContext context) {
-    final retirementAge = _readRetirementAge();
+    final targetAge = _readTargetAge();
     final currentAge = widget.profile.age;
 
-    final isValid = retirementAge != null &&
+    final isValid = targetAge != null &&
         currentAge != null &&
-        retirementAge > currentAge &&
-        retirementAge <= 100;
+        targetAge > currentAge &&
+        targetAge <= 100;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -76,7 +77,8 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
@@ -97,9 +99,11 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 48),
+
               const Text(
-                'Com que idade gostarias de atingir a liberdade financeira?',
+                'Com que idade gostarias de atingir a tua Independência Financeira?',
                 style: TextStyle(
                   fontSize: 40,
                   height: 1.08,
@@ -108,18 +112,22 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                   color: AppTheme.textPrimary,
                 ),
               ),
+
               const SizedBox(height: 14),
+
               const Text(
-                'Este será o objetivo principal do teu plano.',
+                'Este será o objetivo temporal do teu plano.',
                 style: TextStyle(
                   fontSize: 18,
                   height: 1.4,
                   color: AppTheme.textSecondary,
                 ),
               ),
+
               const SizedBox(height: 40),
+
               TextField(
-                controller: _retirementAgeController,
+                controller: _targetAgeController,
                 autofocus: true,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.done,
@@ -139,12 +147,14 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                   ),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
+                  contentPadding:
+                      const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 20,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius:
+                        BorderRadius.circular(18),
                     borderSide: BorderSide.none,
                   ),
                 ),
@@ -155,8 +165,11 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                   }
                 },
               ),
+
               const SizedBox(height: 12),
-              if (_retirementAgeController.text.isNotEmpty && !isValid)
+
+              if (_targetAgeController.text.isNotEmpty &&
+                  !isValid)
                 Text(
                   currentAge == null
                       ? 'Não foi possível identificar a tua idade atual.'
@@ -166,39 +179,55 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                     color: Colors.redAccent,
                   ),
                 ),
+
               const Spacer(),
+
               SizedBox(
                 width: double.infinity,
                 height: 58,
                 child: ElevatedButton(
-                  onPressed: isValid ? _openDashboard : null,
+                  onPressed:
+                      isValid ? _openDashboard : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
+                    backgroundColor:
+                        AppTheme.primary,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor:
-                        AppTheme.primary.withValues(alpha: 0.25),
-                    disabledForegroundColor: Colors.white70,
+                        AppTheme.primary.withValues(
+                      alpha: 0.25,
+                    ),
+                    disabledForegroundColor:
+                        Colors.white70,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(
+                        18,
+                      ),
                     ),
                   ),
                   child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
                     children: [
                       Text(
                         'Ver o meu plano',
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                          fontWeight:
+                              FontWeight.w600,
                         ),
                       ),
                       SizedBox(width: 10),
-                      Icon(Icons.arrow_forward_rounded),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                      ),
                     ],
                   ),
                 ),
               ),
+
               const SizedBox(height: 12),
             ],
           ),
