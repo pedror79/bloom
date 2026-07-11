@@ -145,4 +145,100 @@ void main() {
       );
     });
   });
+
+  group('ProjectionEngine complete projection', () {
+    test('calculates a complete projection result', () {
+      const user = BloomUser(
+        identity: Identity(
+          name: 'Pedro',
+          age: 46,
+        ),
+        financialProfile: FinancialProfile(
+          currentPortfolio: 100000,
+          monthlyInvestment: 500,
+          desiredMonthlyIncomeToday: 3000,
+          targetFinancialIndependenceAge: 60,
+          expectedAnnualReturn: 8,
+          expectedInflation: 2,
+          safeWithdrawalRate: 4,
+        ),
+      );
+
+      final result = engine.calculate(user);
+
+      expect(result.yearsRemaining, 14);
+      expect(result.targetAge, 60);
+      expect(result.targetYear, DateTime.now().year + 14);
+
+      expect(
+        result.fireNumber,
+        closeTo(1187530.89, 0.01),
+      );
+
+      expect(
+        result.projectedPortfolio,
+        closeTo(444262.15, 0.01),
+      );
+
+      expect(
+        result.progress,
+        closeTo(0.3741, 0.0001),
+      );
+
+      expect(result.onTrack, isFalse);
+
+      expect(
+        result.requiredMonthlyInvestment,
+        closeTo(2968.63, 0.01),
+      );
+    });
+
+    test('marks the plan as on track when the target is reached', () {
+      const user = BloomUser(
+        identity: Identity(
+          name: 'Pedro',
+          age: 46,
+        ),
+        financialProfile: FinancialProfile(
+          currentPortfolio: 1500000,
+          monthlyInvestment: 0,
+          desiredMonthlyIncomeToday: 3000,
+          targetFinancialIndependenceAge: 60,
+          expectedAnnualReturn: 8,
+          expectedInflation: 2,
+          safeWithdrawalRate: 4,
+        ),
+      );
+
+      final result = engine.calculate(user);
+
+      expect(result.onTrack, isTrue);
+      expect(result.progress, 1);
+      expect(result.requiredMonthlyInvestment, 0);
+      expect(
+        result.projectedPortfolio,
+        greaterThanOrEqualTo(result.fireNumber),
+      );
+    });
+
+    test('rejects an invalid plan when calculating a projection', () {
+      const user = BloomUser(
+        identity: Identity(
+          name: '',
+          age: 46,
+        ),
+        financialProfile: FinancialProfile(
+          currentPortfolio: 100000,
+          monthlyInvestment: 500,
+          desiredMonthlyIncomeToday: 3000,
+          targetFinancialIndependenceAge: 60,
+        ),
+      );
+
+      expect(
+        () => engine.calculate(user),
+        throwsArgumentError,
+      );
+    });
+  });
 }

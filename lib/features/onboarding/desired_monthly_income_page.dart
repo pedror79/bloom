@@ -1,46 +1,56 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../models/user_profile.dart';
-import 'monthly_investment_page.dart';
+import 'retirement_age_page.dart';
 
-class AgePage extends StatefulWidget {
+class DesiredMonthlyIncomePage extends StatefulWidget {
   final UserProfile profile;
 
-  const AgePage({
+  const DesiredMonthlyIncomePage({
     super.key,
     required this.profile,
   });
 
   @override
-  State<AgePage> createState() => _AgePageState();
+  State<DesiredMonthlyIncomePage> createState() =>
+      _DesiredMonthlyIncomePageState();
 }
 
-class _AgePageState extends State<AgePage> {
-  final TextEditingController _ageController = TextEditingController();
+class _DesiredMonthlyIncomePageState
+    extends State<DesiredMonthlyIncomePage> {
+  final TextEditingController _incomeController =
+      TextEditingController();
 
   @override
   void dispose() {
-    _ageController.dispose();
+    _incomeController.dispose();
     super.dispose();
   }
 
-  int? _readAge() {
-    return int.tryParse(_ageController.text.trim());
+  double? _readIncome() {
+    final text = _incomeController.text
+        .trim()
+        .replaceAll('€', '')
+        .replaceAll(' ', '')
+        .replaceAll(',', '.');
+
+    return double.tryParse(text);
   }
 
-  void _openMonthlyInvestmentPage() {
-    final age = _readAge();
+  void _openRetirementAgePage() {
+    final income = _readIncome();
 
-    if (age == null || age < 18 || age > 100) {
+    if (income == null || income <= 0) {
       return;
     }
 
-    widget.profile.age = age;
+    widget.profile.desiredMonthlyIncomeToday = income;
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MonthlyInvestmentPage(
+        builder: (context) => RetirementAgePage(
           profile: widget.profile,
         ),
       ),
@@ -49,8 +59,8 @@ class _AgePageState extends State<AgePage> {
 
   @override
   Widget build(BuildContext context) {
-    final age = _readAge();
-    final isValidAge = age != null && age >= 18 && age <= 100;
+    final income = _readIncome();
+    final isValid = income != null && income > 0;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -64,7 +74,8 @@ class _AgePageState extends State<AgePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
@@ -76,7 +87,7 @@ class _AgePageState extends State<AgePage> {
                     ),
                   ),
                   const Text(
-                    '2/5',
+                    '4/5',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -86,16 +97,8 @@ class _AgePageState extends State<AgePage> {
                 ],
               ),
               const SizedBox(height: 48),
-              Text(
-                'Prazer, ${widget.profile.name}! 👋',
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 16),
               const Text(
-                'Quantos anos tens?',
+                'Quanto gostarias de receber por mês?',
                 style: TextStyle(
                   fontSize: 40,
                   height: 1.08,
@@ -106,7 +109,7 @@ class _AgePageState extends State<AgePage> {
               ),
               const SizedBox(height: 14),
               const Text(
-                'Usamos esta informação para calcular o teu horizonte financeiro.',
+                'Indica o rendimento mensal desejado em euros de hoje.',
                 style: TextStyle(
                   fontSize: 18,
                   height: 1.4,
@@ -115,57 +118,83 @@ class _AgePageState extends State<AgePage> {
               ),
               const SizedBox(height: 40),
               TextField(
-                controller: _ageController,
+                controller: _incomeController,
                 autofocus: true,
-                keyboardType: TextInputType.number,
+                keyboardType:
+                    const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 textInputAction: TextInputAction.next,
                 style: const TextStyle(
                   fontSize: 22,
                   color: AppTheme.textPrimary,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Ex.: 46',
+                  prefixText: '€  ',
+                  prefixStyle: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primary,
+                  ),
+                  hintText: 'Ex.: 3 000',
                   hintStyle: const TextStyle(
                     color: AppTheme.textSecondary,
                   ),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
+                  contentPadding:
+                      const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 20,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius:
+                        BorderRadius.circular(18),
                     borderSide: BorderSide.none,
                   ),
                 ),
                 onChanged: (_) => setState(() {}),
                 onSubmitted: (_) {
-                  if (isValidAge) {
-                    _openMonthlyInvestmentPage();
+                  if (isValid) {
+                    _openRetirementAgePage();
                   }
                 },
               ),
+              const SizedBox(height: 12),
+              if (_incomeController.text.isNotEmpty &&
+                  !isValid)
+                const Text(
+                  'Introduz um rendimento mensal superior a zero.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.redAccent,
+                  ),
+                ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 height: 58,
                 child: ElevatedButton(
                   onPressed:
-                      isValidAge ? _openMonthlyInvestmentPage : null,
+                      isValid ? _openRetirementAgePage : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primary,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor:
-                        AppTheme.primary.withValues(alpha: 0.25),
-                    disabledForegroundColor: Colors.white70,
+                        AppTheme.primary.withValues(
+                      alpha: 0.25,
+                    ),
+                    disabledForegroundColor:
+                        Colors.white70,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius:
+                          BorderRadius.circular(18),
                     ),
                   ),
                   child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
                     children: [
                       Text(
                         'Continuar',

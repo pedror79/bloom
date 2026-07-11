@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../models/user_profile.dart';
-import 'retirement_age_page.dart';
+import 'desired_monthly_income_page.dart';
 
 class MonthlyInvestmentPage extends StatefulWidget {
   final UserProfile profile;
@@ -37,7 +38,7 @@ class _MonthlyInvestmentPageState
     return double.tryParse(text);
   }
 
-  void _openRetirementAgePage() {
+  void _openDesiredMonthlyIncomePage() {
     final investment = _readInvestment();
 
     if (investment == null || investment < 0) {
@@ -49,7 +50,7 @@ class _MonthlyInvestmentPageState
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RetirementAgePage(
+        builder: (context) => DesiredMonthlyIncomePage(
           profile: widget.profile,
         ),
       ),
@@ -73,7 +74,8 @@ class _MonthlyInvestmentPageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
@@ -85,7 +87,7 @@ class _MonthlyInvestmentPageState
                     ),
                   ),
                   const Text(
-                    '3/4',
+                    '3/5',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -118,7 +120,8 @@ class _MonthlyInvestmentPageState
               TextField(
                 controller: _investmentController,
                 autofocus: true,
-                keyboardType: const TextInputType.numberWithOptions(
+                keyboardType:
+                    const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
                 textInputAction: TextInputAction.next,
@@ -139,19 +142,21 @@ class _MonthlyInvestmentPageState
                   ),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
+                  contentPadding:
+                      const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 20,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius:
+                        BorderRadius.circular(18),
                     borderSide: BorderSide.none,
                   ),
                 ),
                 onChanged: (_) => setState(() {}),
                 onSubmitted: (_) {
                   if (isValid) {
-                    _openRetirementAgePage();
+                    _openDesiredMonthlyIncomePage();
                   }
                 },
               ),
@@ -160,20 +165,27 @@ class _MonthlyInvestmentPageState
                 width: double.infinity,
                 height: 58,
                 child: ElevatedButton(
-                  onPressed: isValid ? _openRetirementAgePage : null,
+                  onPressed: isValid
+                      ? _openDesiredMonthlyIncomePage
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primary,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor:
-                        AppTheme.primary.withValues(alpha: 0.25),
-                    disabledForegroundColor: Colors.white70,
+                        AppTheme.primary.withValues(
+                      alpha: 0.25,
+                    ),
+                    disabledForegroundColor:
+                        Colors.white70,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius:
+                          BorderRadius.circular(18),
                     ),
                   ),
                   child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
                     children: [
                       Text(
                         'Continuar',

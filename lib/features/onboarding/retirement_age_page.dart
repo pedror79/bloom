@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../models/user_profile.dart';
-import '../dashboard/dashboard_page.dart';
+import '../navigation/main_navigation_page.dart';
 
 class RetirementAgePage extends StatefulWidget {
   final UserProfile profile;
@@ -13,10 +13,12 @@ class RetirementAgePage extends StatefulWidget {
   });
 
   @override
-  State<RetirementAgePage> createState() => _RetirementAgePageState();
+  State<RetirementAgePage> createState() =>
+      _RetirementAgePageState();
 }
 
-class _RetirementAgePageState extends State<RetirementAgePage> {
+class _RetirementAgePageState
+    extends State<RetirementAgePage> {
   final TextEditingController _targetAgeController =
       TextEditingController();
 
@@ -27,12 +29,14 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
   }
 
   int? _readTargetAge() {
-    return int.tryParse(_targetAgeController.text.trim());
+    return int.tryParse(
+      _targetAgeController.text.trim(),
+    );
   }
 
   void _openDashboard() {
-    final targetAge = _readTargetAge();
-    final currentAge = widget.profile.age;
+    final int? targetAge = _readTargetAge();
+    final int? currentAge = widget.profile.age;
 
     if (targetAge == null || currentAge == null) {
       return;
@@ -42,12 +46,13 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
       return;
     }
 
-    widget.profile.targetFinancialIndependenceAge = targetAge;
+    widget.profile.targetFinancialIndependenceAge =
+        targetAge;
 
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
-        builder: (context) => DashboardPage(
+        builder: (context) => MainNavigationPage(
           profile: widget.profile,
         ),
       ),
@@ -57,10 +62,10 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
 
   @override
   Widget build(BuildContext context) {
-    final targetAge = _readTargetAge();
-    final currentAge = widget.profile.age;
+    final int? targetAge = _readTargetAge();
+    final int? currentAge = widget.profile.age;
 
-    final isValid = targetAge != null &&
+    final bool isValid = targetAge != null &&
         currentAge != null &&
         targetAge > currentAge &&
         targetAge <= 100;
@@ -74,14 +79,17 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
             vertical: 24,
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment:
                     MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     padding: EdgeInsets.zero,
                     alignment: Alignment.centerLeft,
                     icon: const Icon(
@@ -90,7 +98,7 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                     ),
                   ),
                   const Text(
-                    '4/4',
+                    '5/5',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -99,9 +107,9 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                   ),
                 ],
               ),
-
-              const SizedBox(height: 48),
-
+              const SizedBox(
+                height: 48,
+              ),
               const Text(
                 'Com que idade gostarias de atingir a tua Independência Financeira?',
                 style: TextStyle(
@@ -112,9 +120,9 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                   color: AppTheme.textPrimary,
                 ),
               ),
-
-              const SizedBox(height: 14),
-
+              const SizedBox(
+                height: 14,
+              ),
               const Text(
                 'Este será o objetivo temporal do teu plano.',
                 style: TextStyle(
@@ -123,14 +131,16 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                   color: AppTheme.textSecondary,
                 ),
               ),
-
-              const SizedBox(height: 40),
-
+              const SizedBox(
+                height: 40,
+              ),
               TextField(
                 controller: _targetAgeController,
                 autofocus: true,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.done,
+                keyboardType:
+                    TextInputType.number,
+                textInputAction:
+                    TextInputAction.done,
                 style: const TextStyle(
                   fontSize: 22,
                   color: AppTheme.textPrimary,
@@ -138,12 +148,14 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                 decoration: InputDecoration(
                   hintText: 'Ex.: 58',
                   hintStyle: const TextStyle(
-                    color: AppTheme.textSecondary,
+                    color:
+                        AppTheme.textSecondary,
                   ),
                   suffixText: 'anos',
                   suffixStyle: const TextStyle(
                     fontSize: 18,
-                    color: AppTheme.textSecondary,
+                    color:
+                        AppTheme.textSecondary,
                   ),
                   filled: true,
                   fillColor: Colors.white,
@@ -158,17 +170,20 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                     borderSide: BorderSide.none,
                   ),
                 ),
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) {
+                  setState(() {});
+                },
                 onSubmitted: (_) {
                   if (isValid) {
                     _openDashboard();
                   }
                 },
               ),
-
-              const SizedBox(height: 12),
-
-              if (_targetAgeController.text.isNotEmpty &&
+              const SizedBox(
+                height: 12,
+              ),
+              if (_targetAgeController
+                      .text.isNotEmpty &&
                   !isValid)
                 Text(
                   currentAge == null
@@ -179,9 +194,7 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                     color: Colors.redAccent,
                   ),
                 ),
-
               const Spacer(),
-
               SizedBox(
                 width: double.infinity,
                 height: 58,
@@ -191,7 +204,8 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         AppTheme.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor:
+                        Colors.white,
                     disabledBackgroundColor:
                         AppTheme.primary.withValues(
                       alpha: 0.25,
@@ -202,9 +216,7 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                     shape:
                         RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(
-                        18,
-                      ),
+                          BorderRadius.circular(18),
                     ),
                   ),
                   child: const Row(
@@ -219,7 +231,9 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                               FontWeight.w600,
                         ),
                       ),
-                      SizedBox(width: 10),
+                      SizedBox(
+                        width: 10,
+                      ),
                       Icon(
                         Icons.arrow_forward_rounded,
                       ),
@@ -227,8 +241,9 @@ class _RetirementAgePageState extends State<RetirementAgePage> {
                   ),
                 ),
               ),
-
-              const SizedBox(height: 12),
+              const SizedBox(
+                height: 12,
+              ),
             ],
           ),
         ),
