@@ -18,7 +18,10 @@ class ProjectionEngine {
         const RequiredMonthlyInvestmentCalculator(),
   });
 
-  ProjectionResult calculate(BloomUser user) {
+  ProjectionResult calculate(
+    BloomUser user, {
+    DateTime? referenceDate,
+  }) {
     if (!isFinancialPlanValid(user)) {
       throw ArgumentError.value(
         user,
@@ -30,24 +33,25 @@ class ProjectionEngine {
     final identity = user.identity;
     final profile = user.financialProfile;
 
-    final yearsRemaining =
+    final int yearsRemaining =
         profile.targetFinancialIndependenceAge - identity.age;
 
-    final fireNumber = fireCalculator.calculate(
+    final double fireNumber = fireCalculator.calculate(
       monthlyIncomeToday: profile.desiredMonthlyIncomeToday,
       yearsUntilTarget: yearsRemaining,
       annualInflationRate: profile.expectedInflation,
       safeWithdrawalRate: profile.safeWithdrawalRate,
     );
 
-    final projectedPortfolio = portfolioProjector.project(
+    final double projectedPortfolio =
+        portfolioProjector.project(
       currentPortfolio: profile.currentPortfolio,
       monthlyInvestment: profile.monthlyInvestment,
       years: yearsRemaining,
       annualReturnRate: profile.expectedAnnualReturn,
     );
 
-    final requiredMonthlyInvestment =
+    final double requiredMonthlyInvestment =
         requiredMonthlyInvestmentCalculator.calculate(
       currentPortfolio: profile.currentPortfolio,
       targetPortfolio: fireNumber,
@@ -55,12 +59,18 @@ class ProjectionEngine {
       annualReturnRate: profile.expectedAnnualReturn,
     );
 
-    final progress =
-        (projectedPortfolio / fireNumber).clamp(0.0, 1.0).toDouble();
+    final double progress = _calculateProgress(
+      projectedPortfolio: projectedPortfolio,
+      fireNumber: fireNumber,
+    );
 
-    final onTrack = projectedPortfolio >= fireNumber;
+    final bool onTrack = projectedPortfolio >= fireNumber;
 
-    final targetYear = DateTime.now().year + yearsRemaining;
+    final DateTime calculationDate =
+        referenceDate ?? DateTime.now();
+
+    final int targetYear =
+        calculationDate.year + yearsRemaining;
 
     return ProjectionResult(
       fireNumber: fireNumber,
@@ -75,20 +85,23 @@ class ProjectionEngine {
   }
 
   bool isFinancialPlanValid(BloomUser user) {
+    final identity = user.identity;
     final profile = user.financialProfile;
 
-    return user.identity.name.trim().isNotEmpty &&
-        user.identity.age > 0 &&
+    return identity.name.trim().isNotEmpty &&
+        identity.age > 0 &&
         profile.currentPortfolio >= 0 &&
         profile.monthlyInvestment >= 0 &&
         profile.desiredMonthlyIncomeToday > 0 &&
-        profile.targetFinancialIndependenceAge > user.identity.age &&
+        profile.targetFinancialIndependenceAge > identity.age &&
         profile.targetFinancialIndependenceAge <=
             FinancialConstants.maximumProjectionAge &&
-        profile.expectedAnnualReturn > -FinancialConstants.percent &&
+        profile.expectedAnnualReturn >
+            -FinancialConstants.percent &&
         profile.expectedInflation >= 0 &&
         profile.safeWithdrawalRate > 0 &&
-        profile.safeWithdrawalRate <= FinancialConstants.percent;
+        profile.safeWithdrawalRate <=
+            FinancialConstants.percent;
   }
 
   double adjustMonthlyIncomeForInflation({
@@ -115,5 +128,18 @@ class ProjectionEngine {
       annualInflationRate: annualInflationRate,
       safeWithdrawalRate: safeWithdrawalRate,
     );
+  }
+
+  double _calculateProgress({
+    required double projectedPortfolio,
+    required double fireNumber,
+  }) {
+    if (fireNumber <= 0) {
+      return 0;
+    }
+
+    return (projectedPortfolio / fireNumber)
+        .clamp(0.0, 1.0)
+        .toDouble();
   }
 }

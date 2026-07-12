@@ -31,7 +31,8 @@ class DashboardViewModel {
 
   double get fireNumber => projection.fireNumber;
 
-  double get projectedPortfolio => projection.projectedPortfolio;
+  double get projectedPortfolio =>
+      projection.projectedPortfolio;
 
   double get requiredMonthlyInvestment =>
       projection.requiredMonthlyInvestment;

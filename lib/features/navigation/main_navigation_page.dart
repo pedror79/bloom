@@ -5,6 +5,7 @@ import '../../models/user_profile.dart';
 import '../../shared/widgets/v2/bloom_bottom_navigation.dart';
 import '../dashboard/dashboard_page_v2.dart';
 import '../projections/projections_page.dart';
+import '../simulator/simulator_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
   final UserProfile profile;
@@ -19,14 +20,15 @@ class MainNavigationPage extends StatefulWidget {
       _MainNavigationPageState();
 }
 
-class _MainNavigationPageState
-    extends State<MainNavigationPage> {
+class _MainNavigationPageState extends State<MainNavigationPage> {
   int _currentIndex = 0;
 
   void _selectPage(int index) {
-    if (index == _currentIndex) {
+    if (index < 0 || index > 3 || index == _currentIndex) {
       return;
     }
+
+    FocusManager.instance.primaryFocus?.unfocus();
 
     setState(() {
       _currentIndex = index;
@@ -46,11 +48,8 @@ class _MainNavigationPageState
           ProjectionsPage(
             profile: widget.profile,
           ),
-          const _NavigationPlaceholderPage(
-            icon: Icons.calculate_rounded,
-            title: 'Simulador',
-            description:
-                'Experimenta diferentes cenários de investimento.',
+          SimulatorPage(
+            profile: widget.profile,
           ),
           const _NavigationPlaceholderPage(
             icon: Icons.person_rounded,
@@ -91,69 +90,75 @@ class _NavigationPlaceholderPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const _BloomHeader(),
-            const Spacer(),
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    width: 88,
-                    height: 88,
-                    decoration: BoxDecoration(
-                      color: DesignTokens.primaryLight,
-                      borderRadius: BorderRadius.circular(
-                        DesignTokens.radiusXl,
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 420,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          color: DesignTokens.primaryLight,
+                          borderRadius: BorderRadius.circular(
+                            DesignTokens.radiusXl,
+                          ),
+                        ),
+                        child: Icon(
+                          icon,
+                          size: 42,
+                          color: DesignTokens.primary,
+                        ),
                       ),
-                    ),
-                    child: Icon(
-                      icon,
-                      size: 42,
-                      color: DesignTokens.primary,
-                    ),
+                      const SizedBox(
+                        height: DesignTokens.spacingLg,
+                      ),
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          height: 1.1,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.6,
+                          color: DesignTokens.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: DesignTokens.spacingSm,
+                      ),
+                      Text(
+                        description,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          height: 1.5,
+                          fontWeight: FontWeight.w500,
+                          color: DesignTokens.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: DesignTokens.spacingMd,
+                      ),
+                      const Text(
+                        'Disponível numa próxima sprint.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 1.4,
+                          fontWeight: FontWeight.w600,
+                          color: DesignTokens.primary,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(
-                    height: DesignTokens.spacingLg,
-                  ),
-                  Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      height: 1.1,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.6,
-                      color: DesignTokens.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: DesignTokens.spacingSm,
-                  ),
-                  Text(
-                    description,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      height: 1.5,
-                      fontWeight: FontWeight.w500,
-                      color: DesignTokens.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: DesignTokens.spacingMd,
-                  ),
-                  const Text(
-                    'Disponível numa próxima sprint.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      height: 1.4,
-                      fontWeight: FontWeight.w600,
-                      color: DesignTokens.primary,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-            const Spacer(),
           ],
         ),
       ),

@@ -11,6 +11,54 @@ class RequiredMonthlyInvestmentCalculator {
     required int years,
     required double annualReturnRate,
   }) {
+    _validateInputs(
+      currentPortfolio: currentPortfolio,
+      targetPortfolio: targetPortfolio,
+      years: years,
+      annualReturnRate: annualReturnRate,
+    );
+
+    final int totalMonths =
+        years * FinancialConstants.monthsPerYear;
+
+    final double monthlyReturnRate =
+        _monthlyReturnRate(annualReturnRate);
+
+    final double projectedCurrentPortfolio =
+        currentPortfolio *
+            pow(
+              1 + monthlyReturnRate,
+              totalMonths,
+            ).toDouble();
+
+    if (projectedCurrentPortfolio >= targetPortfolio) {
+      return 0;
+    }
+
+    final double remainingTarget =
+        targetPortfolio - projectedCurrentPortfolio;
+
+    if (monthlyReturnRate == 0) {
+      return remainingTarget / totalMonths;
+    }
+
+    final double futureValueFactor =
+        (pow(
+                  1 + monthlyReturnRate,
+                  totalMonths,
+                ).toDouble() -
+                1) /
+            monthlyReturnRate;
+
+    return remainingTarget / futureValueFactor;
+  }
+
+  void _validateInputs({
+    required double currentPortfolio,
+    required double targetPortfolio,
+    required int years,
+    required double annualReturnRate,
+  }) {
     if (currentPortfolio < 0) {
       throw ArgumentError.value(
         currentPortfolio,
@@ -35,44 +83,28 @@ class RequiredMonthlyInvestmentCalculator {
       );
     }
 
-    if (annualReturnRate <= -FinancialConstants.percent) {
+    if (annualReturnRate <=
+        -FinancialConstants.percent) {
       throw ArgumentError.value(
         annualReturnRate,
         'annualReturnRate',
         'A rentabilidade anual tem de ser superior a -100%.',
       );
     }
+  }
 
-    final totalMonths = years * FinancialConstants.monthsPerYear;
-    final annualReturnDecimal =
-        annualReturnRate / FinancialConstants.percent;
+  double _monthlyReturnRate(
+    double annualReturnRate,
+  ) {
+    final double annualReturnDecimal =
+        annualReturnRate /
+            FinancialConstants.percent;
 
-    final monthlyReturnRate =
-        pow(
+    return pow(
           1 + annualReturnDecimal,
           1 / FinancialConstants.monthsPerYear,
-        ).toDouble() -
+        )
+            .toDouble() -
         1;
-
-    final projectedCurrentPortfolio =
-        currentPortfolio *
-        pow(1 + monthlyReturnRate, totalMonths).toDouble();
-
-    if (projectedCurrentPortfolio >= targetPortfolio) {
-      return 0;
-    }
-
-    final remainingTarget =
-        targetPortfolio - projectedCurrentPortfolio;
-
-    if (monthlyReturnRate == 0) {
-      return remainingTarget / totalMonths;
-    }
-
-    final futureValueFactor =
-        (pow(1 + monthlyReturnRate, totalMonths).toDouble() - 1) /
-        monthlyReturnRate;
-
-    return remainingTarget / futureValueFactor;
   }
 }

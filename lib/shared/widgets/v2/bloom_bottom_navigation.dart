@@ -25,45 +25,114 @@ class BloomBottomNavigation extends StatelessWidget {
         ),
         boxShadow: DesignTokens.navigationShadow,
       ),
-      child: Row(
-        children: [
-          _item(0, Icons.home_rounded),
-          _item(1, Icons.insights_rounded),
-          _item(2, Icons.calculate_rounded),
-          _item(3, Icons.person_rounded),
-        ],
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: const [
+            _NavigationItemData(
+              index: 0,
+              icon: Icons.home_rounded,
+              label: 'Dashboard',
+            ),
+            _NavigationItemData(
+              index: 1,
+              icon: Icons.insights_rounded,
+              label: 'Portfolio',
+            ),
+            _NavigationItemData(
+              index: 2,
+              icon: Icons.calculate_rounded,
+              label: 'Projection',
+            ),
+            _NavigationItemData(
+              index: 3,
+              icon: Icons.person_rounded,
+              label: 'Profile',
+            ),
+          ].map(
+            (item) => Expanded(
+              child: _NavigationItem(
+                data: item,
+              ),
+            ),
+          ).toList(),
+        ),
       ),
     );
   }
+}
 
-  Widget _item(int index, IconData icon) {
-    final selected = index == currentIndex;
+class _NavigationItemData {
+  final int index;
+  final IconData icon;
+  final String label;
 
-    return Expanded(
-      child: InkWell(
-        onTap: () => onTap?.call(index),
-        child: Center(
-          child: AnimatedContainer(
-            duration: DesignTokens.animationNormal,
-            curve: DesignTokens.animationCurve,
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              color: selected
-                  ? DesignTokens.primaryLight
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(
-                DesignTokens.radiusMd,
+  const _NavigationItemData({
+    required this.index,
+    required this.icon,
+    required this.label,
+  });
+}
+
+class _NavigationItem extends StatelessWidget {
+  final _NavigationItemData data;
+
+  const _NavigationItem({
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final navigation =
+        context.findAncestorWidgetOfExactType<BloomBottomNavigation>()!;
+
+    final selected = data.index == navigation.currentIndex;
+
+    return InkWell(
+      onTap: () => navigation.onTap?.call(data.index),
+      child: AnimatedContainer(
+        duration: DesignTokens.animationNormal,
+        curve: DesignTokens.animationCurve,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: DesignTokens.animationNormal,
+              curve: DesignTokens.animationCurve,
+              width: 52,
+              height: 36,
+              decoration: BoxDecoration(
+                color: selected
+                    ? DesignTokens.primaryLight
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(
+                  DesignTokens.radiusMd,
+                ),
+              ),
+              child: Icon(
+                data.icon,
+                size: 26,
+                color: selected
+                    ? DesignTokens.primary
+                    : DesignTokens.navigationInactive,
               ),
             ),
-            child: Icon(
-              icon,
-              size: 28,
-              color: selected
-                  ? DesignTokens.primary
-                  : DesignTokens.navigationInactive,
+            const SizedBox(height: 4),
+            AnimatedDefaultTextStyle(
+              duration: DesignTokens.animationNormal,
+              curve: DesignTokens.animationCurve,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight:
+                    selected ? FontWeight.w600 : FontWeight.w500,
+                color: selected
+                    ? DesignTokens.primary
+                    : DesignTokens.navigationInactive,
+              ),
+              child: Text(data.label),
             ),
-          ),
+          ],
         ),
       ),
     );

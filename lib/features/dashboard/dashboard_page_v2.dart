@@ -22,13 +22,13 @@ class DashboardPageV2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = DashboardViewModel.fromProfile(profile);
+    final DashboardViewModel viewModel =
+        DashboardViewModel.fromProfile(profile);
 
     final double currentMonthlyInvestment =
         (profile.monthlyInvestment ?? 0).toDouble();
 
-    final double fireNumber =
-        viewModel.fireNumber.toDouble();
+    final double fireNumber = viewModel.fireNumber.toDouble();
 
     final double projectedPortfolio =
         viewModel.projectedPortfolio.toDouble();
@@ -36,7 +36,10 @@ class DashboardPageV2 extends StatelessWidget {
     final double requiredMonthlyInvestment =
         viewModel.requiredMonthlyInvestment.toDouble();
 
-    final double progress = viewModel.progress.toDouble();
+    final double progress = viewModel.progress
+        .toDouble()
+        .clamp(0.0, 1.0)
+        .toDouble();
 
     final double missingPortfolio = math.max(
       fireNumber - projectedPortfolio,
@@ -50,6 +53,10 @@ class DashboardPageV2 extends StatelessWidget {
 
     final String progressLabel =
         FinancialFormatter.percentage(progress);
+
+    final String displayName = profile.name.trim().isEmpty
+        ? 'Investidor'
+        : profile.name.trim();
 
     return Scaffold(
       backgroundColor: DesignTokens.background,
@@ -69,27 +76,8 @@ class DashboardPageV2 extends StatelessWidget {
               const SizedBox(
                 height: DesignTokens.spacingXl,
               ),
-              Text(
-                'Olá, ${profile.name} 👋',
-                style: const TextStyle(
-                  fontSize: 15,
-                  height: 1.3,
-                  fontWeight: FontWeight.w500,
-                  color: DesignTokens.textSecondary,
-                ),
-              ),
-              const SizedBox(
-                height: DesignTokens.spacingXs,
-              ),
-              const Text(
-                'O Meu Plano',
-                style: TextStyle(
-                  fontSize: 34,
-                  height: 1.08,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.9,
-                  color: DesignTokens.textPrimary,
-                ),
+              _DashboardIntroduction(
+                displayName: displayName,
               ),
               const SizedBox(
                 height: DesignTokens.spacingXl,
@@ -110,108 +98,25 @@ class DashboardPageV2 extends StatelessWidget {
               const SizedBox(
                 height: DesignTokens.spacingMd,
               ),
-              SizedBox(
-                height: 290,
-                child: Row(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: MetricCard(
-                        title: 'Número FIRE',
-                        subtitle: 'Objetivo final',
-                        value:
-                            FinancialFormatter.compactCurrency(
-                          fireNumber,
-                        ),
-                        icon: Icons.flag_outlined,
-                        actionLabel: 'Ver detalhes',
-                        supportingContent: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(
-                                DesignTokens.radiusPill,
-                              ),
-                              child: LinearProgressIndicator(
-                                value: progress,
-                                minHeight: 8,
-                                backgroundColor:
-                                    DesignTokens.progressTrack,
-                                valueColor:
-                                    const AlwaysStoppedAnimation<
-                                        Color>(
-                                  DesignTokens.primary,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: DesignTokens.spacingSm,
-                            ),
-                            Text(
-                              viewModel.onTrack
-                                  ? 'Objetivo alcançável'
-                                  : 'Faltam ${FinancialFormatter.compactCurrency(missingPortfolio)}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                height: 1.3,
-                                fontWeight: FontWeight.w600,
-                                color:
-                                    DesignTokens.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        onTap: () {
-                          _showComingSoon(context);
-                        },
-                      ),
-                    ),
-                    const SizedBox(
-                      width: DesignTokens.spacingMd,
-                    ),
-                    Expanded(
-                      child: MetricCard(
-                        title: 'Património projetado',
-                        subtitle:
-                            'À idade de independência',
-                        value:
-                            FinancialFormatter.compactCurrency(
-                          projectedPortfolio,
-                        ),
-                        icon: Icons.trending_up_rounded,
-                        actionLabel: 'Ver projeção',
-                        supportingContent: Text(
-                          viewModel.onTrack
-                              ? 'Acima do objetivo'
-                              : 'Abaixo do objetivo',
-                          style: TextStyle(
-                            fontSize: 13,
-                            height: 1.3,
-                            fontWeight: FontWeight.w700,
-                            color: viewModel.onTrack
-                                ? DesignTokens.success
-                                : DesignTokens.danger,
-                          ),
-                        ),
-                        onTap: () {
-                          _showComingSoon(context);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+              _DashboardMetrics(
+                fireNumber: fireNumber,
+                projectedPortfolio: projectedPortfolio,
+                progress: progress,
+                missingPortfolio: missingPortfolio,
+                onTrack: viewModel.onTrack,
+                onFireNumberTap: () {
+                  _showComingSoon(context);
+                },
+                onProjectionTap: () {
+                  _showComingSoon(context);
+                },
               ),
               const SizedBox(
                 height: DesignTokens.spacingMd,
               ),
               _InvestmentCard(
-                currentInvestment:
-                    currentMonthlyInvestment,
-                requiredInvestment:
-                    requiredMonthlyInvestment,
+                currentInvestment: currentMonthlyInvestment,
+                requiredInvestment: requiredMonthlyInvestment,
                 onTap: () {
                   _showComingSoon(context);
                 },
@@ -223,8 +128,7 @@ class DashboardPageV2 extends StatelessWidget {
                 title: 'Insight Bloom',
                 message: _buildInsightMessage(
                   viewModel: viewModel,
-                  monthlyDifference:
-                      monthlyDifference,
+                  monthlyDifference: monthlyDifference,
                 ),
                 onTap: () {
                   _showComingSoon(context);
@@ -269,12 +173,192 @@ class DashboardPageV2 extends StatelessWidget {
   }
 
   void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Esta funcionalidade será adicionada numa próxima sprint.',
+    final ScaffoldMessengerState messenger =
+        ScaffoldMessenger.of(context);
+
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Esta funcionalidade será adicionada numa próxima sprint.',
+          ),
+        ),
+      );
+  }
+}
+
+class _DashboardIntroduction extends StatelessWidget {
+  final String displayName;
+
+  const _DashboardIntroduction({
+    required this.displayName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Olá, $displayName 👋',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 15,
+            height: 1.3,
+            fontWeight: FontWeight.w500,
+            color: DesignTokens.textSecondary,
+          ),
+        ),
+        const SizedBox(
+          height: DesignTokens.spacingXs,
+        ),
+        const Text(
+          'O Meu Plano',
+          style: TextStyle(
+            fontSize: 34,
+            height: 1.08,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.9,
+            color: DesignTokens.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DashboardMetrics extends StatelessWidget {
+  final double fireNumber;
+  final double projectedPortfolio;
+  final double progress;
+  final double missingPortfolio;
+  final bool onTrack;
+  final VoidCallback onFireNumberTap;
+  final VoidCallback onProjectionTap;
+
+  const _DashboardMetrics({
+    required this.fireNumber,
+    required this.projectedPortfolio,
+    required this.progress,
+    required this.missingPortfolio,
+    required this.onTrack,
+    required this.onFireNumberTap,
+    required this.onProjectionTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget fireNumberCard = MetricCard(
+      title: 'Número FIRE',
+      subtitle: 'Objetivo final',
+      value: FinancialFormatter.compactCurrency(
+        fireNumber,
+      ),
+      icon: Icons.flag_outlined,
+      actionLabel: 'Ver detalhes',
+      supportingContent: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(
+              DesignTokens.radiusPill,
+            ),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor: DesignTokens.progressTrack,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                DesignTokens.primary,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: DesignTokens.spacingSm,
+          ),
+          Text(
+            onTrack
+                ? 'Objetivo alcançável'
+                : 'Faltam '
+                    '${FinancialFormatter.compactCurrency(missingPortfolio)}',
+            style: const TextStyle(
+              fontSize: 13,
+              height: 1.3,
+              fontWeight: FontWeight.w600,
+              color: DesignTokens.textSecondary,
+            ),
+          ),
+        ],
+      ),
+      onTap: onFireNumberTap,
+    );
+
+    final Widget projectedPortfolioCard = MetricCard(
+      title: 'Património projetado',
+      subtitle: 'À idade de independência',
+      value: FinancialFormatter.compactCurrency(
+        projectedPortfolio,
+      ),
+      icon: Icons.trending_up_rounded,
+      actionLabel: 'Ver projeção',
+      supportingContent: Text(
+        onTrack
+            ? 'Acima do objetivo'
+            : 'Abaixo do objetivo',
+        style: TextStyle(
+          fontSize: 13,
+          height: 1.3,
+          fontWeight: FontWeight.w700,
+          color: onTrack
+              ? DesignTokens.success
+              : DesignTokens.danger,
         ),
       ),
+      onTap: onProjectionTap,
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool useVerticalLayout =
+            constraints.maxWidth < 360;
+
+        if (useVerticalLayout) {
+          return Column(
+            children: [
+              SizedBox(
+                height: 290,
+                child: fireNumberCard,
+              ),
+              const SizedBox(
+                height: DesignTokens.spacingMd,
+              ),
+              SizedBox(
+                height: 290,
+                child: projectedPortfolioCard,
+              ),
+            ],
+          );
+        }
+
+        return SizedBox(
+          height: 290,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: fireNumberCard,
+              ),
+              const SizedBox(
+                width: DesignTokens.spacingMd,
+              ),
+              Expanded(
+                child: projectedPortfolioCard,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -357,10 +441,8 @@ class _InvestmentCard extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width:
-                      DesignTokens.iconContainerMedium,
-                  height:
-                      DesignTokens.iconContainerMedium,
+                  width: DesignTokens.iconContainerMedium,
+                  height: DesignTokens.iconContainerMedium,
                   decoration: BoxDecoration(
                     color: DesignTokens.primaryLight,
                     borderRadius: BorderRadius.circular(
@@ -387,14 +469,15 @@ class _InvestmentCard extends StatelessWidget {
                           fontSize: 16,
                           height: 1.2,
                           fontWeight: FontWeight.w700,
-                          color:
-                              DesignTokens.textPrimary,
+                          color: DesignTokens.textPrimary,
                         ),
                       ),
                       const SizedBox(
                         height: DesignTokens.spacingSm,
                       ),
                       Row(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: _InvestmentMetric(
@@ -407,14 +490,12 @@ class _InvestmentCard extends StatelessWidget {
                           ),
                           Container(
                             width: 1,
-                            height: 38,
-                            margin:
-                                const EdgeInsets.symmetric(
+                            height: 42,
+                            margin: const EdgeInsets.symmetric(
                               horizontal:
                                   DesignTokens.spacingMd,
                             ),
-                            color:
-                                DesignTokens.borderSoft,
+                            color: DesignTokens.borderSoft,
                           ),
                           Expanded(
                             child: _InvestmentMetric(
@@ -475,6 +556,7 @@ class _InvestmentMetric extends StatelessWidget {
         Text(
           value,
           maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(
             fontSize: 16,
             height: 1.2,

@@ -20,9 +20,7 @@ class ProjectionsPage extends StatelessWidget {
     final DashboardViewModel viewModel =
         DashboardViewModel.fromProfile(profile);
 
-    final double fireNumber =
-        viewModel.fireNumber.toDouble();
-
+    final double fireNumber = viewModel.fireNumber.toDouble();
     final double projectedPortfolio =
         viewModel.projectedPortfolio.toDouble();
 
@@ -34,7 +32,7 @@ class ProjectionsPage extends StatelessWidget {
     final double portfolioDifference =
         projectedPortfolio - fireNumber;
 
-    final double absoluteDifference =
+    final double displayedDifference =
         portfolioDifference.abs();
 
     final double remainingPortfolio = math.max(
@@ -60,28 +58,7 @@ class ProjectionsPage extends StatelessWidget {
               const SizedBox(
                 height: DesignTokens.spacingXl,
               ),
-              const Text(
-                'Projeções',
-                style: TextStyle(
-                  fontSize: 34,
-                  height: 1.08,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.9,
-                  color: DesignTokens.textPrimary,
-                ),
-              ),
-              const SizedBox(
-                height: DesignTokens.spacingXs,
-              ),
-              const Text(
-                'Acompanha a evolução prevista do teu património.',
-                style: TextStyle(
-                  fontSize: 15,
-                  height: 1.4,
-                  fontWeight: FontWeight.w500,
-                  color: DesignTokens.textSecondary,
-                ),
-              ),
+              const _PageIntroduction(),
               const SizedBox(
                 height: DesignTokens.spacingXl,
               ),
@@ -94,34 +71,16 @@ class ProjectionsPage extends StatelessWidget {
               const SizedBox(
                 height: DesignTokens.spacingMd,
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: _ProjectionMetricCard(
-                      icon: Icons.calendar_today_outlined,
-                      label: 'Horizonte',
-                      value:
-                          '${viewModel.yearsRemaining} anos',
-                    ),
-                  ),
-                  const SizedBox(
-                    width: DesignTokens.spacingMd,
-                  ),
-                  Expanded(
-                    child: _ProjectionMetricCard(
-                      icon: Icons.flag_outlined,
-                      label: 'Ano objetivo',
-                      value: '${viewModel.targetYear}',
-                    ),
-                  ),
-                ],
+              _ProjectionMetrics(
+                yearsRemaining: viewModel.yearsRemaining,
+                targetYear: viewModel.targetYear,
               ),
               const SizedBox(
                 height: DesignTokens.spacingMd,
               ),
               _DifferenceCard(
                 onTrack: viewModel.onTrack,
-                difference: absoluteDifference,
+                difference: displayedDifference,
                 remainingPortfolio: remainingPortfolio,
                 targetAge: viewModel.targetAge,
               ),
@@ -137,6 +96,41 @@ class ProjectionsPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _PageIntroduction extends StatelessWidget {
+  const _PageIntroduction();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Projeções',
+          style: TextStyle(
+            fontSize: 34,
+            height: 1.08,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.9,
+            color: DesignTokens.textPrimary,
+          ),
+        ),
+        SizedBox(
+          height: DesignTokens.spacingXs,
+        ),
+        Text(
+          'Acompanha a evolução prevista do teu património.',
+          style: TextStyle(
+            fontSize: 15,
+            height: 1.4,
+            fontWeight: FontWeight.w500,
+            color: DesignTokens.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -175,8 +169,7 @@ class _ProjectionSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
@@ -189,8 +182,7 @@ class _ProjectionSummaryCard extends StatelessWidget {
                         fontSize: 15,
                         height: 1.3,
                         fontWeight: FontWeight.w600,
-                        color:
-                            DesignTokens.textSecondary,
+                        color: DesignTokens.textSecondary,
                       ),
                     ),
                     const SizedBox(
@@ -211,11 +203,12 @@ class _ProjectionSummaryCard extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(
+                width: DesignTokens.spacingMd,
+              ),
               Container(
-                width:
-                    DesignTokens.iconContainerMedium,
-                height:
-                    DesignTokens.iconContainerMedium,
+                width: DesignTokens.iconContainerMedium,
+                height: DesignTokens.iconContainerMedium,
                 decoration: BoxDecoration(
                   color: DesignTokens.primaryLight,
                   borderRadius: BorderRadius.circular(
@@ -240,8 +233,7 @@ class _ProjectionSummaryCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 10,
-              backgroundColor:
-                  DesignTokens.progressTrack,
+              backgroundColor: DesignTokens.progressTrack,
               valueColor:
                   const AlwaysStoppedAnimation<Color>(
                 DesignTokens.primary,
@@ -252,11 +244,10 @@ class _ProjectionSummaryCard extends StatelessWidget {
             height: DesignTokens.spacingSm,
           ),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                FinancialFormatter.percentage(
-                  progress,
-                ),
+                FinancialFormatter.percentage(progress),
                 style: const TextStyle(
                   fontSize: 14,
                   height: 1.3,
@@ -264,14 +255,20 @@ class _ProjectionSummaryCard extends StatelessWidget {
                   color: DesignTokens.primary,
                 ),
               ),
-              const Spacer(),
-              Text(
-                'Objetivo: ${FinancialFormatter.compactCurrency(fireNumber)}',
-                style: const TextStyle(
-                  fontSize: 13,
-                  height: 1.3,
-                  fontWeight: FontWeight.w500,
-                  color: DesignTokens.textSecondary,
+              const SizedBox(
+                width: DesignTokens.spacingMd,
+              ),
+              Expanded(
+                child: Text(
+                  'Objetivo: '
+                  '${FinancialFormatter.compactCurrency(fireNumber)}',
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.3,
+                    fontWeight: FontWeight.w500,
+                    color: DesignTokens.textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -279,21 +276,55 @@ class _ProjectionSummaryCard extends StatelessWidget {
           const SizedBox(
             height: DesignTokens.spacingMd,
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: DesignTokens.spacingMd,
-              vertical: DesignTokens.spacingSm,
-            ),
-            decoration: BoxDecoration(
-              color: onTrack
-                  ? DesignTokens.primaryLight
-                  : DesignTokens.danger.withValues(
-                      alpha: 0.10,
-                    ),
-              borderRadius: BorderRadius.circular(
-                DesignTokens.radiusPill,
+          _ProjectionStatusBadge(
+            onTrack: onTrack,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProjectionStatusBadge extends StatelessWidget {
+  final bool onTrack;
+
+  const _ProjectionStatusBadge({
+    required this.onTrack,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.spacingMd,
+        vertical: DesignTokens.spacingSm,
+      ),
+      decoration: BoxDecoration(
+        color: onTrack
+            ? DesignTokens.primaryLight
+            : DesignTokens.danger.withValues(
+                alpha: 0.10,
               ),
-            ),
+        borderRadius: BorderRadius.circular(
+          DesignTokens.radiusPill,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            onTrack
+                ? Icons.check_circle_outline_rounded
+                : Icons.warning_amber_rounded,
+            size: 17,
+            color: onTrack
+                ? DesignTokens.primary
+                : DesignTokens.danger,
+          ),
+          const SizedBox(
+            width: DesignTokens.spacingXs,
+          ),
+          Flexible(
             child: Text(
               onTrack
                   ? 'Projeção acima do objetivo'
@@ -314,6 +345,64 @@ class _ProjectionSummaryCard extends StatelessWidget {
   }
 }
 
+class _ProjectionMetrics extends StatelessWidget {
+  final int yearsRemaining;
+  final int targetYear;
+
+  const _ProjectionMetrics({
+    required this.yearsRemaining,
+    required this.targetYear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool useVerticalLayout =
+            constraints.maxWidth < 340;
+
+        final Widget horizonCard = _ProjectionMetricCard(
+          icon: Icons.calendar_today_outlined,
+          label: 'Horizonte',
+          value: '$yearsRemaining anos',
+        );
+
+        final Widget targetYearCard = _ProjectionMetricCard(
+          icon: Icons.flag_outlined,
+          label: 'Ano objetivo',
+          value: '$targetYear',
+        );
+
+        if (useVerticalLayout) {
+          return Column(
+            children: [
+              horizonCard,
+              const SizedBox(
+                height: DesignTokens.spacingMd,
+              ),
+              targetYearCard,
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            Expanded(
+              child: horizonCard,
+            ),
+            const SizedBox(
+              width: DesignTokens.spacingMd,
+            ),
+            Expanded(
+              child: targetYearCard,
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 class _ProjectionMetricCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -328,6 +417,7 @@ class _ProjectionMetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(
         DesignTokens.spacingMd,
       ),
@@ -426,15 +516,16 @@ class _DifferenceCard extends StatelessWidget {
                 )
               : DesignTokens.borderSoft,
         ),
+        boxShadow: onTrack
+            ? const []
+            : DesignTokens.cardShadow,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width:
-                DesignTokens.iconContainerMedium,
-            height:
-                DesignTokens.iconContainerMedium,
+            width: DesignTokens.iconContainerMedium,
+            height: DesignTokens.iconContainerMedium,
             decoration: BoxDecoration(
               color: DesignTokens.surface,
               borderRadius: BorderRadius.circular(
@@ -554,6 +645,7 @@ class _MilestoneCard extends StatelessWidget {
             height: DesignTokens.spacingMd,
           ),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 52,
@@ -575,7 +667,8 @@ class _MilestoneCard extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  'Em $targetYear, aos $targetAge anos, o património projetado é de '
+                  'Em $targetYear, aos $targetAge anos, '
+                  'o património projetado é de '
                   '${FinancialFormatter.compactCurrency(projectedPortfolio)}.',
                   style: const TextStyle(
                     fontSize: 15,
