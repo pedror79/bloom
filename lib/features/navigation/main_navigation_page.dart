@@ -23,6 +23,26 @@ class MainNavigationPage extends StatefulWidget {
 class _MainNavigationPageState extends State<MainNavigationPage> {
   int _currentIndex = 0;
 
+  late UserProfile _profile;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _profile = widget.profile.copyWith();
+  }
+
+  @override
+  void didUpdateWidget(
+    covariant MainNavigationPage oldWidget,
+  ) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.profile != widget.profile) {
+      _profile = widget.profile.copyWith();
+    }
+  }
+
   void _selectPage(int index) {
     if (index < 0 || index > 3 || index == _currentIndex) {
       return;
@@ -35,6 +55,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     });
   }
 
+  void _updateProfile(UserProfile updatedProfile) {
+    setState(() {
+      _profile = updatedProfile;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,13 +69,14 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         index: _currentIndex,
         children: [
           DashboardPageV2(
-            profile: widget.profile,
+            profile: _profile,
           ),
           ProjectionsPage(
-            profile: widget.profile,
+            profile: _profile,
+            onProfileChanged: _updateProfile,
           ),
           SimulatorPage(
-            profile: widget.profile,
+            profile: _profile,
           ),
           const _NavigationPlaceholderPage(
             icon: Icons.person_rounded,

@@ -250,9 +250,9 @@ class _DashboardMetrics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget fireNumberCard = MetricCard(
-      title: 'Número FIRE',
-      subtitle: 'Objetivo final',
+    final Widget objectiveCard = MetricCard(
+      title: 'Objetivo',
+      subtitle: 'Independência financeira',
       value: FinancialFormatter.compactCurrency(
         fireNumber,
       ),
@@ -328,7 +328,7 @@ class _DashboardMetrics extends StatelessWidget {
             children: [
               SizedBox(
                 height: 290,
-                child: fireNumberCard,
+                child: objectiveCard,
               ),
               const SizedBox(
                 height: DesignTokens.spacingMd,
@@ -347,7 +347,7 @@ class _DashboardMetrics extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: fireNumberCard,
+                child: objectiveCard,
               ),
               const SizedBox(
                 width: DesignTokens.spacingMd,

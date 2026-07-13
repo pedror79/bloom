@@ -37,17 +37,17 @@ class BloomBottomNavigation extends StatelessWidget {
             _NavigationItemData(
               index: 1,
               icon: Icons.insights_rounded,
-              label: 'Portfolio',
+              label: 'Projeções',
             ),
             _NavigationItemData(
               index: 2,
               icon: Icons.calculate_rounded,
-              label: 'Projection',
+              label: 'Simulador',
             ),
             _NavigationItemData(
               index: 3,
               icon: Icons.person_rounded,
-              label: 'Profile',
+              label: 'Perfil',
             ),
           ].map(
             (item) => Expanded(
@@ -83,17 +83,21 @@ class _NavigationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navigation =
-        context.findAncestorWidgetOfExactType<BloomBottomNavigation>()!;
+    final BloomBottomNavigation navigation =
+        context.findAncestorWidgetOfExactType<
+            BloomBottomNavigation>()!;
 
-    final selected = data.index == navigation.currentIndex;
+    final bool selected =
+        data.index == navigation.currentIndex;
 
     return InkWell(
       onTap: () => navigation.onTap?.call(data.index),
       child: AnimatedContainer(
         duration: DesignTokens.animationNormal,
         curve: DesignTokens.animationCurve,
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          vertical: 8,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -118,19 +122,24 @@ class _NavigationItem extends StatelessWidget {
                     : DesignTokens.navigationInactive,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(
+              height: 4,
+            ),
             AnimatedDefaultTextStyle(
               duration: DesignTokens.animationNormal,
               curve: DesignTokens.animationCurve,
               style: TextStyle(
                 fontSize: 11,
-                fontWeight:
-                    selected ? FontWeight.w600 : FontWeight.w500,
+                fontWeight: selected
+                    ? FontWeight.w600
+                    : FontWeight.w500,
                 color: selected
                     ? DesignTokens.primary
                     : DesignTokens.navigationInactive,
               ),
-              child: Text(data.label),
+              child: Text(
+                data.label,
+              ),
             ),
           ],
         ),
