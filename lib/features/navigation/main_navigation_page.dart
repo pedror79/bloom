@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/design_tokens.dart';
+import '../../models/simulation_scenario.dart';
 import '../../models/user_profile.dart';
 import '../../shared/widgets/v2/bloom_bottom_navigation.dart';
+import '../comparison/comparison_page.dart';
 import '../dashboard/dashboard_page_v2.dart';
 import '../projections/projections_page.dart';
 import '../simulator/simulator_page.dart';
@@ -24,12 +26,14 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   int _currentIndex = 0;
 
   late UserProfile _profile;
+  late SimulationScenario _simulationScenario;
 
   @override
   void initState() {
     super.initState();
 
     _profile = widget.profile.copyWith();
+    _simulationScenario = _createInitialScenario(_profile);
   }
 
   @override
@@ -40,11 +44,26 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
     if (oldWidget.profile != widget.profile) {
       _profile = widget.profile.copyWith();
+      _simulationScenario = _createInitialScenario(_profile);
     }
   }
 
+  SimulationScenario _createInitialScenario(
+    UserProfile profile,
+  ) {
+    final int currentAge = profile.age ?? 18;
+
+    return SimulationScenario(
+      monthlyInvestment:
+          (profile.monthlyInvestment ?? 0).toDouble(),
+      targetAge:
+          profile.targetFinancialIndependenceAge ??
+              currentAge + 20,
+    );
+  }
+
   void _selectPage(int index) {
-    if (index < 0 || index > 3 || index == _currentIndex) {
+    if (index < 0 || index > 4 || index == _currentIndex) {
       return;
     }
 
@@ -58,6 +77,14 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   void _updateProfile(UserProfile updatedProfile) {
     setState(() {
       _profile = updatedProfile;
+    });
+  }
+
+  void _updateSimulationScenario(
+    SimulationScenario updatedScenario,
+  ) {
+    setState(() {
+      _simulationScenario = updatedScenario;
     });
   }
 
@@ -77,12 +104,18 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           ),
           SimulatorPage(
             profile: _profile,
+            scenario: _simulationScenario,
+            onScenarioChanged: _updateSimulationScenario,
+          ),
+          ComparisonPage(
+            profile: _profile,
+            scenario: _simulationScenario,
           ),
           const _NavigationPlaceholderPage(
             icon: Icons.person_rounded,
             title: 'Perfil',
             description:
-                'Consulta e atualiza os dados do teu plano financeiro.',
+                'Consulta e atualiza os dados e pressupostos do teu plano financeiro.',
           ),
         ],
       ),

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/design_tokens.dart';
+import '../../models/simulation_scenario.dart';
 import '../../models/user_profile.dart';
 
 class SimulatorPage extends StatefulWidget {
   final UserProfile profile;
+  final SimulationScenario scenario;
+  final ValueChanged<SimulationScenario> onScenarioChanged;
 
   const SimulatorPage({
     super.key,
     required this.profile,
+    required this.scenario,
+    required this.onScenarioChanged,
   });
 
   @override
@@ -23,14 +28,33 @@ class _SimulatorPageState extends State<SimulatorPage> {
   void initState() {
     super.initState();
 
-    _monthlyInvestment =
-        (widget.profile.monthlyInvestment ?? 0).toDouble();
+    _monthlyInvestment = widget.scenario.monthlyInvestment;
+    _targetAge = widget.scenario.targetAge;
+  }
 
-    final int currentAge = widget.profile.age ?? 18;
+  @override
+  void didUpdateWidget(
+    covariant SimulatorPage oldWidget,
+  ) {
+    super.didUpdateWidget(oldWidget);
 
-    _targetAge =
-        widget.profile.targetFinancialIndependenceAge ??
-            currentAge + 20;
+    if (oldWidget.scenario != widget.scenario) {
+      _monthlyInvestment = widget.scenario.monthlyInvestment;
+      _targetAge = widget.scenario.targetAge;
+    }
+  }
+
+  void _updateScenario({
+    double? monthlyInvestment,
+    int? targetAge,
+  }) {
+    final SimulationScenario updatedScenario =
+        widget.scenario.copyWith(
+      monthlyInvestment: monthlyInvestment,
+      targetAge: targetAge,
+    );
+
+    widget.onScenarioChanged(updatedScenario);
   }
 
   @override
@@ -109,6 +133,10 @@ class _SimulatorPageState extends State<SimulatorPage> {
                     setState(() {
                       _monthlyInvestment = value;
                     });
+
+                    _updateScenario(
+                      monthlyInvestment: value,
+                    );
                   },
                 ),
               ),
@@ -127,9 +155,15 @@ class _SimulatorPageState extends State<SimulatorPage> {
                       maximumTargetAge - minimumTargetAge,
                   label: '$safeTargetAge anos',
                   onChanged: (value) {
+                    final int updatedTargetAge = value.round();
+
                     setState(() {
-                      _targetAge = value.round();
+                      _targetAge = updatedTargetAge;
                     });
+
+                    _updateScenario(
+                      targetAge: updatedTargetAge,
+                    );
                   },
                 ),
               ),

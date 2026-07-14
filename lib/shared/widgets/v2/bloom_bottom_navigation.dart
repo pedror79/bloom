@@ -14,6 +14,34 @@ class BloomBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const List<_NavigationItemData> items = [
+      _NavigationItemData(
+        index: 0,
+        icon: Icons.home_rounded,
+        label: 'Dashboard',
+      ),
+      _NavigationItemData(
+        index: 1,
+        icon: Icons.insights_rounded,
+        label: 'Projeções',
+      ),
+      _NavigationItemData(
+        index: 2,
+        icon: Icons.calculate_rounded,
+        label: 'Simulador',
+      ),
+      _NavigationItemData(
+        index: 3,
+        icon: Icons.compare_arrows_rounded,
+        label: 'Comparar',
+      ),
+      _NavigationItemData(
+        index: 4,
+        icon: Icons.person_rounded,
+        label: 'Perfil',
+      ),
+    ];
+
     return Container(
       height: DesignTokens.bottomNavigationHeight,
       decoration: BoxDecoration(
@@ -28,33 +56,16 @@ class BloomBottomNavigation extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Row(
-          children: const [
-            _NavigationItemData(
-              index: 0,
-              icon: Icons.home_rounded,
-              label: 'Dashboard',
-            ),
-            _NavigationItemData(
-              index: 1,
-              icon: Icons.insights_rounded,
-              label: 'Projeções',
-            ),
-            _NavigationItemData(
-              index: 2,
-              icon: Icons.calculate_rounded,
-              label: 'Simulador',
-            ),
-            _NavigationItemData(
-              index: 3,
-              icon: Icons.person_rounded,
-              label: 'Perfil',
-            ),
-          ].map(
-            (item) => Expanded(
-              child: _NavigationItem(
-                data: item,
-              ),
-            ),
+          children: items.map(
+            (item) {
+              return Expanded(
+                child: _NavigationItem(
+                  data: item,
+                  selected: item.index == currentIndex,
+                  onTap: onTap,
+                ),
+              );
+            },
           ).toList(),
         ),
       ),
@@ -76,22 +87,23 @@ class _NavigationItemData {
 
 class _NavigationItem extends StatelessWidget {
   final _NavigationItemData data;
+  final bool selected;
+  final ValueChanged<int>? onTap;
 
   const _NavigationItem({
     required this.data,
+    required this.selected,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final BloomBottomNavigation navigation =
-        context.findAncestorWidgetOfExactType<
-            BloomBottomNavigation>()!;
-
-    final bool selected =
-        data.index == navigation.currentIndex;
-
     return InkWell(
-      onTap: () => navigation.onTap?.call(data.index),
+      onTap: onTap == null
+          ? null
+          : () {
+              onTap!(data.index);
+            },
       child: AnimatedContainer(
         duration: DesignTokens.animationNormal,
         curve: DesignTokens.animationCurve,
@@ -104,8 +116,8 @@ class _NavigationItem extends StatelessWidget {
             AnimatedContainer(
               duration: DesignTokens.animationNormal,
               curve: DesignTokens.animationCurve,
-              width: 52,
-              height: 36,
+              width: 46,
+              height: 34,
               decoration: BoxDecoration(
                 color: selected
                     ? DesignTokens.primaryLight
@@ -116,7 +128,7 @@ class _NavigationItem extends StatelessWidget {
               ),
               child: Icon(
                 data.icon,
-                size: 26,
+                size: 24,
                 color: selected
                     ? DesignTokens.primary
                     : DesignTokens.navigationInactive,
@@ -129,7 +141,7 @@ class _NavigationItem extends StatelessWidget {
               duration: DesignTokens.animationNormal,
               curve: DesignTokens.animationCurve,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: selected
                     ? FontWeight.w600
                     : FontWeight.w500,
@@ -139,6 +151,8 @@ class _NavigationItem extends StatelessWidget {
               ),
               child: Text(
                 data.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
