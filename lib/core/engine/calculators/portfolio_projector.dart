@@ -11,26 +11,48 @@ class PortfolioProjector {
     required int years,
     required double annualReturnRate,
   }) {
-    _validateInputs(
-      currentPortfolio: currentPortfolio,
-      monthlyInvestment: monthlyInvestment,
-      years: years,
-      annualReturnRate: annualReturnRate,
-    );
-
-    if (years == 0) {
-      return currentPortfolio;
+    if (years < 0) {
+      throw ArgumentError.value(
+        years,
+        'years',
+        'O horizonte temporal não pode ser negativo.',
+      );
     }
 
     final int totalMonths =
         years * FinancialConstants.monthsPerYear;
+
+    return projectMonths(
+      currentPortfolio: currentPortfolio,
+      monthlyInvestment: monthlyInvestment,
+      months: totalMonths,
+      annualReturnRate: annualReturnRate,
+    );
+  }
+
+  double projectMonths({
+    required double currentPortfolio,
+    required double monthlyInvestment,
+    required int months,
+    required double annualReturnRate,
+  }) {
+    _validateInputs(
+      currentPortfolio: currentPortfolio,
+      monthlyInvestment: monthlyInvestment,
+      months: months,
+      annualReturnRate: annualReturnRate,
+    );
+
+    if (months == 0) {
+      return currentPortfolio;
+    }
 
     final double monthlyReturnRate =
         _monthlyReturnRate(annualReturnRate);
 
     double portfolio = currentPortfolio;
 
-    for (int month = 0; month < totalMonths; month++) {
+    for (int month = 0; month < months; month++) {
       portfolio *= 1 + monthlyReturnRate;
       portfolio += monthlyInvestment;
     }
@@ -41,7 +63,7 @@ class PortfolioProjector {
   void _validateInputs({
     required double currentPortfolio,
     required double monthlyInvestment,
-    required int years,
+    required int months,
     required double annualReturnRate,
   }) {
     if (currentPortfolio < 0) {
@@ -60,10 +82,10 @@ class PortfolioProjector {
       );
     }
 
-    if (years < 0) {
+    if (months < 0) {
       throw ArgumentError.value(
-        years,
-        'years',
+        months,
+        'months',
         'O horizonte temporal não pode ser negativo.',
       );
     }
@@ -88,8 +110,7 @@ class PortfolioProjector {
     return pow(
           1 + annualReturnDecimal,
           1 / FinancialConstants.monthsPerYear,
-        )
-            .toDouble() -
+        ).toDouble() -
         1;
   }
 }

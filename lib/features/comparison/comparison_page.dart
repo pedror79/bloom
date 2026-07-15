@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/design_tokens.dart';
 import '../../models/simulation_scenario.dart';
 import '../../models/user_profile.dart';
+import 'comparison_chart.dart';
 import 'comparison_view_model.dart';
 
 class ComparisonPage extends StatelessWidget {
@@ -88,6 +89,12 @@ class ComparisonPage extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: DesignTokens.textSecondary,
                 ),
+              ),
+              const SizedBox(
+                height: DesignTokens.spacingXl,
+              ),
+              ComparisonChart(
+                points: viewModel.chartPoints,
               ),
               const SizedBox(
                 height: DesignTokens.spacingXl,
