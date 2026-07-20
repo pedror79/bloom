@@ -6,7 +6,6 @@ import '../../models/user_profile.dart';
 import 'comparison_chart.dart';
 import 'comparison_summary_card.dart';
 import 'comparison_view_model.dart';
-import '../../core/engine/bloom_insight_engine.dart';
 
 class ComparisonPage extends StatelessWidget {
   final UserProfile profile;
@@ -126,7 +125,7 @@ class ComparisonPage extends StatelessWidget {
                 height: DesignTokens.spacingLg,
               ),
               _BloomInsightCard(
-                insight: viewModel.insight,
+                insight: viewModel.bloomInsight,
                 freedomYearsGained:
                     viewModel.freedomYearsGained,
                 portfolioDifference:
@@ -329,7 +328,7 @@ class _DecisionMetric extends StatelessWidget {
 }
 
 class _BloomInsightCard extends StatelessWidget {
-  final BloomInsightResult insight;
+  final String insight;
   final int freedomYearsGained;
   final double portfolioDifference;
 
@@ -395,8 +394,8 @@ class _BloomInsightCard extends StatelessWidget {
                   crossAxisAlignment:
                       CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      insight.title,
+                    const Text(
+                      'Bloom Insight',
                       style: TextStyle(
                         fontSize: 17,
                         height: 1.2,
@@ -408,19 +407,7 @@ class _BloomInsightCard extends StatelessWidget {
                       height: DesignTokens.spacingSm,
                     ),
                     Text(
-                      insight.message,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        height: 1.5,
-                        fontWeight: FontWeight.w500,
-                        color: DesignTokens.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: DesignTokens.spacingSm,
-                    ),
-                    Text(
-                      insight.recommendation,
+                      insight,
                       style: const TextStyle(
                         fontSize: 14,
                         height: 1.5,

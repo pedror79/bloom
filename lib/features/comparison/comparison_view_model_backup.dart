@@ -1,4 +1,3 @@
-import '../../core/engine/bloom_insight_engine.dart';
 import '../../core/engine/timeline_engine.dart';
 import '../../core/models/timeline_point.dart';
 import '../../models/simulation_scenario.dart';
@@ -25,7 +24,6 @@ class ComparisonViewModel {
   final int targetAgeDifference;
   final int freedomYearsGained;
 
-  final BloomInsightResult insight;
   final String bloomInsight;
 
   const ComparisonViewModel({
@@ -41,7 +39,6 @@ class ComparisonViewModel {
     required this.portfolioDifferencePercent,
     required this.targetAgeDifference,
     required this.freedomYearsGained,
-    required this.insight,
     required this.bloomInsight,
   });
 
@@ -122,8 +119,7 @@ class ComparisonViewModel {
     final int freedomYearsGained =
         official.targetAge - simulated.targetAge;
 
-    final BloomInsightResult insight =
-        BloomInsightEngine.generate(
+    final String bloomInsight = _buildBloomInsight(
       monthlyInvestmentDifference:
           monthlyInvestmentDifference,
       dailyInvestmentDifference:
@@ -131,9 +127,6 @@ class ComparisonViewModel {
       portfolioDifference: portfolioDifference,
       freedomYearsGained: freedomYearsGained,
     );
-
-    final String bloomInsight =
-        insight.message;
 
     return ComparisonViewModel(
       officialProfile: profile,
@@ -152,7 +145,6 @@ class ComparisonViewModel {
           portfolioDifferencePercent,
       targetAgeDifference: targetAgeDifference,
       freedomYearsGained: freedomYearsGained,
-      insight: insight,
       bloomInsight: bloomInsight,
     );
   }
@@ -240,5 +232,51 @@ class ComparisonViewModel {
     return points;
   }
 
+  static String _buildBloomInsight({
+    required double monthlyInvestmentDifference,
+    required double dailyInvestmentDifference,
+    required double portfolioDifference,
+    required int freedomYearsGained,
+  }) {
+    if (monthlyInvestmentDifference == 0 &&
+        freedomYearsGained == 0) {
+      return 'O cenário simulado é igual ao teu Plano Oficial. '
+          'Experimenta alterar o investimento mensal ou a idade objetivo.';
+    }
 
+    if (monthlyInvestmentDifference > 0 &&
+        freedomYearsGained > 0) {
+      return 'Ao investir mais '
+          '${dailyInvestmentDifference.abs().toStringAsFixed(2)} € por dia, '
+          'este cenário pode antecipar a tua liberdade financeira em '
+          '$freedomYearsGained '
+          '${freedomYearsGained == 1 ? 'ano' : 'anos'}.';
+    }
+
+    if (freedomYearsGained > 0) {
+      return 'Este cenário pode antecipar a tua liberdade financeira em '
+          '$freedomYearsGained '
+          '${freedomYearsGained == 1 ? 'ano' : 'anos'}.';
+    }
+
+    if (portfolioDifference > 0) {
+      return 'Este cenário aumenta o teu património projetado em '
+          '${portfolioDifference.toStringAsFixed(0)} €.';
+    }
+
+    if (monthlyInvestmentDifference < 0) {
+      return 'Este cenário reduz o investimento mensal em '
+          '${monthlyInvestmentDifference.abs().toStringAsFixed(0)} €. '
+          'Analisa o impacto no teu objetivo antes de decidir.';
+    }
+
+    if (freedomYearsGained < 0) {
+      return 'Este cenário adia a tua liberdade financeira em '
+          '${freedomYearsGained.abs()} '
+          '${freedomYearsGained.abs() == 1 ? 'ano' : 'anos'}.';
+    }
+
+    return 'Este cenário altera o teu plano financeiro. '
+        'Compara os resultados antes de tomar uma decisão.';
+  }
 }
